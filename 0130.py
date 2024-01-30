@@ -79,29 +79,67 @@ def main():
     sum_top = sum_w_prod_name.sort_values(by='total_reorders', ascending=False).head()
     
     #-----------------------------------------------------------
-    # order_prod[order_prod['add_to_cart_order']==1]
 
     tab1, tab2, tab3 = st.tabs(['Most Reorderd', 'Sales by Products', 'Sales by Hour'])
     with tab1:      
         fig = px.bar(
         sum_top, x='product_name', y = 'total_reorders', title='Most Frequently Reordered',
-        labels={'total_reorders': 'Total Rerder', 'product_name': 'Product Name'})
+        labels={'total_reorders': 'Total Rerder', 'product_name': 'Product Name'},
+        color='product_name')
     
         st.plotly_chart(fig, use_container_width=True)
     
     with tab2:
-        fig = px.histogram(
-        top_10_orders, x='product_name', title='Sales By Products',
-        labels={'product_name': 'Product Name', 'count': 'Count'})
-    
+        fig = go.Figure()
+        fig.add_trace(go.Histogram(
+        x=top_10_orders['product_name'], 
+        marker_color='#A0A0FF'))
+
+        fig.update_layout(
+            title='Sales By Products',
+            xaxis_title='Product Name', 
+            yaxis_title='Count' 
+        )
+
         st.plotly_chart(fig, use_container_width=True)
     
     with tab3:
         fig = px.histogram(
         orders, x='order_hour_of_day', title='Sales Per Hour',
-        labels={'order_hour_of_day': 'Order hour', 'Count': 'Count'})
+        labels={'order_hour_of_day': 'Order Hour', 'Count': 'Count'})
     
         st.plotly_chart(fig, use_container_width=True)
+    #-----------------------------------------------------------
+    # KPI
+    kpi1, kpi2, kpi3 = st.columns(3)   
+
+    # 가장 판매량 높은 dept
+    merged = pd.merge(order_prod, products, on='product_id')
+    dep_sales = merged.groupby('department_id')['order_id'].count().reset_index(name='total_sales')
+    sales_max = dep_sales.sort_values(by='total_sales', ascending=False).head(1)
+    # st.table(sales_max[['department_id', 'dep_sales']])
+    
+    # kpi1.metric(
+    # label="Top Dept ⏳",
+    # value=sales_max,
+    # delta=sales_max - 10,
+    # )
+
+    # 구매량에 따른 VIP고객 선정
+    # sum = orders.groupby('user_id')['order_number'].sum().reset_index(name='sum')
+    # max_sale = sum.sort_values(by='sum', ascending=False).head(1)
+
+    # kpi2.metric(
+    #     label="VIP Customer 💍",
+    #     value=max_sale,
+    #     delta=-10 + max_sale,
+    # )
+
+    # kpi3.metric(
+    #     label="A/C Balance ＄",
+    #     value=f"$ {round(balance,2)} ",
+    #     delta=-round(balance / count_married) * 100,
+    # )
 
 if __name__ == "__main__":
     main()
