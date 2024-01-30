@@ -12,12 +12,12 @@ gc.enable()
 
 @st.cache_data
 def load_orders():
-    orders = pd.read_csv('data/sample_order11.csv')
+    orders = pd.read_csv('data/sample_order1.csv')
     return orders
 
 @st.cache_data
 def load_products():
-    products = pd.read_csv('data/sample_products.csv')
+    products = pd.read_csv('data/sample_products1.csv')
     return products
 
 # @st.cache_data
@@ -34,12 +34,12 @@ def load_products():
 
 @st.cache_data
 def load_order_prod():
-    order_prod = pd.read_csv('data/sample_order_prod11.csv')
+    order_prod = pd.read_csv('data/sample_order_prod1.csv')
     return order_prod
 
 def main():
     import os
-    for dirname, _, filenames in os.walk('/kaggle/input'):
+    for dirname, _, filenames in os.walk('kaggle/input'):
         for filename in filenames:
             print(os.path.join(dirname, filename))
 
